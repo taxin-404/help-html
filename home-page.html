@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startpage</title>
+    <style>
+        :root {
+            --bg: #1e1e2e;
+            --fg: #cdd6f4;
+            --accent: #cba6f7;
+            --peach: #fab387;
+            --card-bg: #181825;
+            --box-bg: #313244;
+            --border: #45475a;
+            --subtext: #a6adc8;
+            --overlay: #585b70;
+            --ash: #313244; 
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .header { text-align: center; margin-bottom: 25px; }
+
+        /* TIME GLOW RESTORED */
+        #clock { 
+            font-size: 9rem; 
+            font-weight: 800; 
+            color: var(--accent); 
+            margin: 0; 
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(203, 166, 247, 0.4), 0 0 40px rgba(203, 166, 247, 0.2);
+        }
+
+        .support-link { 
+            display: block;
+            font-size: 0.9rem; 
+            color: var(--subtext); 
+            text-transform: uppercase; 
+            letter-spacing: 5px; 
+            margin-top: 10px; 
+            font-weight: 600; 
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .support-link:hover { color: var(--peach); text-shadow: 0 0 10px var(--peach); }
+
+        .search-container {
+            width: 100%;
+            max-width: 650px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background-color: var(--ash);
+            color: var(--fg);
+            text-align: center;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* SEARCH ANIMATION FIX */
+        .search-bar::placeholder { 
+            color: var(--subtext); 
+            transition: opacity 0.2s ease, transform 0.2s ease; 
+        }
+        .search-bar:focus::placeholder { 
+            opacity: 0; 
+            transform: translateY(-5px); 
+        }
+
+        .search-bar:focus {
+            background-color: var(--card-bg);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(203, 166, 247, 0.25);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 95%;
+            max-width: 1200px;
+            align-items: start;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .section-header {
+            background-color: var(--accent);
+            color: var(--bg);
+            padding: 12px;
+            text-align: center;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        /* SCROLLABLE COMPACT LISTS */
+        .shortcut-list {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 350px; 
+            overflow-y: auto;
+        }
+
+        .shortcut-list::-webkit-scrollbar { width: 4px; }
+        .shortcut-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        .box { background-color: var(--box-bg); border-radius: 8px; transition: 0.2s; }
+        .box a { 
+            color: var(--fg); 
+            text-decoration: none; 
+            display: flex; 
+            align-items: center; 
+            padding: 12px; 
+            gap: 15px; 
+        }
+        
+        .box img { 
+            width: 20px; 
+            height: 20px; 
+            border-radius: 4px; 
+            filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+        }
+
+        .box:hover { background-color: var(--peach); transform: scale(1.03); }
+        .box:hover a { color: var(--bg); font-weight: 700; }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--accent);
+            border-radius: 0 0 12px 12px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: none;
+            z-index: 1000;
+        }
+        .suggestions li { padding: 12px; cursor: pointer; color: var(--subtext); text-align: left; }
+        .suggestions li:hover { background: var(--overlay); color: var(--accent); }
+    </style>
+</head>
+<body onload="init()">
+
+    <div class="header">
+        <div id="clock">--:-- --</div>
+        <a href="https://github.com/Mutacim-Billah-Tacin" target="_blank" class="support-link">Support Me</a>
+    </div>
+
+    <div class="search-container">
+        <form action="https://www.google.com/search" method="get" id="search-form">
+            <input type="text" name="q" id="search-input" class="search-bar" 
+                   placeholder="Search Google..." autofocus autocomplete="off">
+            <ul id="suggestions-box" class="suggestions"></ul>
+        </form>
+    </div>
+
+    <div class="container" id="main-container"></div>
+
+    <script>
+        // EDIT YOUR SHORTCUTS HERE - Logos will generate automatically
+        const categories = {
+            "Daily": [
+                { name: "Gmail", url: "https://gmail.com" },
+                { name: "Keybr", url: "https://keybr.com" },
+                { name: "YouTube", url: "https://youtube.com" },
+                { name: "Fizzy", url: "https://app.fizzy.do" }
+            ],
+            "Social": [
+                { name: "Discord", url: "https://discord.com" },
+                { name: "Messenger", url: "https://www.facebook.com/messages" },
+                { name: "Reddit", url: "https://reddit.com" },
+                { name: "Telegram", url: "https://web.telegram.org" },
+                { name: "WhatsApp", url: "https://web.whatsapp.com" },
+                { name: "X", url: "https://x.com" }
+            ],
+            "Tools": [
+                { name: "ChatGPT", url: "https://chatgpt.com" },
+                { name: "Figma", url: "https://figma.com" },
+                { name: "Gemini", url: "https://gemini.google.com" },
+                { name: "GitHub", url: "https://github.com" },
+                { name: "Router", url: "http://192.168.0.1" }
+            ],
+            "Trash": [
+                { name: "Comick", url: "https://comick.dev" },
+                { name: "Comix", url: "https://comix.to" },
+                { name: "Spotify", url: "https://open.spotify.com" }
+            ]
+        };
+
+        function buildGrid() {
+            const container = document.getElementById('main-container');
+            container.innerHTML = ''; // Clear existing content
+            
+            for (const [title, items] of Object.entries(categories)) {
+                const section = document.createElement('div');
+                section.className = 'section';
+                section.innerHTML = `
+                    <div class="section-header">${title}</div>
+                    <div class="shortcut-list">
+                        ${items.map(item => {
+                            // Standardize URL for processing
+                            const urlObj = new URL(item.url.startsWith('http') ? item.url : `https://${item.url}`);
+                            let hostname = urlObj.hostname;
+
+                            // UNIVERSAL FIX: Strip subdomains so the API hits the root domain (e.g., whatsapp.com instead of web.whatsapp.com)
+                            const logoDomain = hostname.replace(/^(web|app|www|m|mobile)\./, '');
+
+                            // LOCAL FIX: Check if it's an internal IP/Localhost (since Google API can't reach your home network)
+                            const isInternal = /^(127|192|10|172)\./.test(hostname) || hostname === 'localhost';
+                            
+                            const logoUrl = isInternal 
+                                ? `https://www.google.com/s2/favicons?domain=google.com&sz=64` 
+                                : `https://www.google.com/s2/favicons?domain=${logoDomain}&sz=64`;
+
+                            return `
+                                <div class="box">
+                                    <a href="${item.url}">
+                                        <img src="${logoUrl}" onerror="this.src='https://www.google.com/s2/favicons?domain=google.com&sz=64'">
+                                        ${item.name}
+                                    </a>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+            }
+        }
+        
+        const input = document.getElementById('search-input');
+        const box = document.getElementById('suggestions-box');
+        const form = document.getElementById('search-form');
+
+        function init() {
+            buildGrid();
+            updateClock();
+            setInterval(updateClock, 1000);
+            input.focus();
+        }
+
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours() % 12 || 12;
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+            document.getElementById('clock').textContent = `${hours}:${minutes} ${ampm}`;
+        }
+
+        window.handleSuggestions = function(data) {
+            const results = data[1];
+            box.innerHTML = '';
+            if (results && results.length > 0) {
+                box.style.display = 'block';
+                input.style.borderRadius = "12px 12px 0 0";
+                results.slice(0, 6).forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    li.onclick = () => { input.value = item; form.submit(); };
+                    box.appendChild(li);
+                });
+            } else { hideSuggestions(); }
+        };
+
+        function hideSuggestions() { box.style.display = 'none'; input.style.borderRadius = "12px"; }
+
+        input.addEventListener('input', () => {
+            const query = input.value.trim();
+            if (query.length > 0) {
+                const script = document.createElement('script');
+                script.src = `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}&callback=handleSuggestions`;
+                document.head.appendChild(script);
+            } else { hideSuggestions(); }
+        });
+
+        document.addEventListener('click', (e) => { if (!input.contains(e.target)) hideSuggestions(); });
+    </script>
+</body>
+</html>
