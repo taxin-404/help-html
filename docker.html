@@ -1,0 +1,2100 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Docker শেখার সম্পূর্ণ গাইডবুক 🐳</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-deep: #060d1a;
+        --bg-main: #0b1529;
+        --bg-card: #0f1d35;
+        --bg-card-hover: #142440;
+        --bg-code: #080f1e;
+        --bg-reader: #0d1a30;
+        --border: #1a2d4f;
+        --border-active: #2a4a7a;
+        --text-primary: #e2eaf3;
+        --text-secondary: #8a9fc0;
+        --text-muted: #5a7099;
+        --text-body: #c5d3e8;
+        --docker-blue: #0db7ed;
+        --accent-cyan: #4fc3f7;
+        --accent-green: #66bb6a;
+        --accent-yellow: #ffd54f;
+        --accent-orange: #ffab40;
+        --accent-red: #ef5350;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Noto Sans Bengali", "Outfit", sans-serif;
+        background: var(--bg-deep);
+        color: var(--text-primary);
+        line-height: 1.75;
+        min-height: 100vh;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse at 15% 0%,
+            rgba(13, 183, 237, 0.07) 0%,
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at 85% 100%,
+            rgba(30, 144, 255, 0.05) 0%,
+            transparent 55%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 32px 18px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* HEADER */
+      .header {
+        text-align: center;
+        margin-bottom: 36px;
+        animation: fadeDown 0.7s ease;
+      }
+      @keyframes fadeDown {
+        from {
+          opacity: 0;
+          transform: translateY(-18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .whale {
+        font-size: 52px;
+        display: block;
+        margin-bottom: 10px;
+        animation: swim 4s ease-in-out infinite;
+      }
+      @keyframes swim {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0);
+        }
+        25% {
+          transform: translateY(-6px) rotate(-2deg);
+        }
+        75% {
+          transform: translateY(3px) rotate(1deg);
+        }
+      }
+      .header h1 {
+        font-family: "Outfit", "Noto Sans Bengali", sans-serif;
+        font-size: 30px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #0db7ed, #4fc3f7, #81d4fa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .header .sub {
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-top: 5px;
+      }
+      .header .badge {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        background: rgba(13, 183, 237, 0.12);
+        color: var(--accent-cyan);
+        border: 1px solid rgba(13, 183, 237, 0.25);
+      }
+
+      /* PROGRESS */
+      .progress-box {
+        max-width: 460px;
+        margin: 20px auto 0;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px 18px;
+      }
+      .progress-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+      .progress-row .done {
+        color: var(--accent-cyan);
+        font-weight: 600;
+      }
+      .pbar {
+        background: var(--bg-deep);
+        border-radius: 10px;
+        height: 10px;
+        overflow: hidden;
+      }
+      .pfill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #0db7ed, #4fc3f7);
+        border-radius: 10px;
+        transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 0 12px rgba(13, 183, 237, 0.35);
+      }
+
+      /* PHASE */
+      .phase {
+        margin-bottom: 34px;
+      }
+      .phase-head {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-bottom: 14px;
+      }
+      .phase-ico {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+        flex-shrink: 0;
+        border: 2px solid;
+      }
+      .phase-lbl {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+      }
+      .phase-ttl {
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      /* TIMELINE */
+      .timeline {
+        margin-left: 23px;
+        padding-left: 28px;
+        border-left: 2px solid;
+      }
+
+      /* TOPIC CARD */
+      .tcard {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 13px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+      }
+      .tcard:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--border-active);
+        transform: translateX(2px);
+      }
+      .tcard.open {
+        border-color: var(--border-active);
+        background: var(--bg-card-hover);
+      }
+      .tcard::before {
+        content: "";
+        position: absolute;
+        left: -35px;
+        top: 18px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid;
+        background: var(--bg-deep);
+        transition: all 0.3s;
+      }
+      .tcard.done::before {
+        box-shadow: 0 0 8px;
+      }
+      .ttop {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .tleft {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex: 1;
+        min-width: 0;
+      }
+      .tnum {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 5px;
+        flex-shrink: 0;
+      }
+      .tname {
+        font-weight: 600;
+        font-size: 14.5px;
+        transition: opacity 0.3s;
+      }
+      .tcard.done .tname {
+        text-decoration: line-through;
+        opacity: 0.45;
+      }
+      .tright {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .readbtn {
+        padding: 4px 12px;
+        border-radius: 7px;
+        border: 1px solid;
+        background: transparent;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: "Noto Sans Bengali", sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .readbtn:hover {
+        filter: brightness(1.3);
+      }
+      .chkbtn {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        border: 2px solid;
+        background: transparent;
+        cursor: pointer;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        color: inherit;
+        padding: 0;
+      }
+      .chkbtn.on {
+        color: #fff;
+      }
+      .arr {
+        color: var(--text-muted);
+        font-size: 15px;
+        transition: transform 0.2s;
+        user-select: none;
+      }
+      .tcard.open .arr {
+        transform: rotate(180deg);
+      }
+
+      /* MINI DETAILS */
+      .tdetails {
+        display: none;
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+      }
+      .tcard.open .tdetails {
+        display: block;
+        animation: slideD 0.3s ease;
+      }
+      @keyframes slideD {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .dlabel {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+      }
+      .ditem {
+        padding: 5px 0 5px 16px;
+        font-size: 13px;
+        color: #a8bcd5;
+        border-left: 2px solid;
+        margin-bottom: 2px;
+      }
+      .clabel {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 14px 0 6px;
+      }
+      .cblock {
+        background: var(--bg-code);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        padding: 12px 14px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        color: var(--accent-cyan);
+        line-height: 1.7;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        position: relative;
+      }
+      .cpbtn {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        background: rgba(79, 195, 247, 0.1);
+        border: 1px solid rgba(79, 195, 247, 0.2);
+        color: var(--accent-cyan);
+        font-size: 10px;
+        padding: 3px 9px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: "Outfit", sans-serif;
+        transition: all 0.2s;
+      }
+      .cpbtn:hover {
+        background: rgba(79, 195, 247, 0.2);
+      }
+
+      /* ========== READER OVERLAY ========== */
+      .reader-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: rgba(4, 8, 18, 0.85);
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.3s;
+      }
+      .reader-overlay.active {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 20px;
+        overflow-y: auto;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .reader-panel {
+        background: var(--bg-reader);
+        border: 1px solid var(--border-active);
+        border-radius: 18px;
+        max-width: 720px;
+        width: 100%;
+        margin: 20px auto;
+        padding: 0;
+        animation: slideUp 0.4s ease;
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.6),
+          0 0 40px rgba(13, 183, 237, 0.08);
+      }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .reader-header {
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .reader-header .rh-left {
+        flex: 1;
+      }
+      .reader-header .rh-phase {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+      .reader-header .rh-title {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .reader-header .rh-num {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 6px;
+      }
+      .close-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text-muted);
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .close-btn:hover {
+        background: var(--accent-red);
+        color: #fff;
+        border-color: var(--accent-red);
+      }
+
+      .reader-body {
+        padding: 24px;
+      }
+
+      /* Reader content styles */
+      .r-section {
+        margin-bottom: 24px;
+      }
+      .r-section:last-child {
+        margin-bottom: 0;
+      }
+      .r-h2 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .r-h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin: 14px 0 8px;
+      }
+      .r-p {
+        font-size: 14px;
+        color: var(--text-body);
+        line-height: 1.85;
+        margin-bottom: 10px;
+      }
+      .r-ul {
+        margin: 8px 0 12px 20px;
+      }
+      .r-ul li {
+        font-size: 13.5px;
+        color: var(--text-body);
+        margin-bottom: 5px;
+        line-height: 1.7;
+      }
+      .r-note {
+        background: rgba(255, 213, 79, 0.06);
+        border-left: 3px solid var(--accent-yellow);
+        padding: 10px 14px;
+        border-radius: 0 8px 8px 0;
+        margin: 12px 0;
+        font-size: 13px;
+        color: #ddd;
+      }
+      .r-tip {
+        background: rgba(102, 187, 106, 0.06);
+        border-left: 3px solid var(--accent-green);
+        padding: 10px 14px;
+        border-radius: 0 8px 8px 0;
+        margin: 12px 0;
+        font-size: 13px;
+        color: #ddd;
+      }
+      .r-warn {
+        background: rgba(239, 83, 80, 0.06);
+        border-left: 3px solid var(--accent-red);
+        padding: 10px 14px;
+        border-radius: 0 8px 8px 0;
+        margin: 12px 0;
+        font-size: 13px;
+        color: #ddd;
+      }
+      .r-code {
+        background: var(--bg-code);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        padding: 14px 16px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12.5px;
+        color: var(--accent-cyan);
+        line-height: 1.7;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        margin: 10px 0;
+        position: relative;
+      }
+      .r-code .cpbtn {
+        top: 6px;
+        right: 6px;
+      }
+      .r-comment {
+        color: #5a7a5a;
+      }
+      .r-output {
+        color: #888;
+        font-style: italic;
+      }
+      .r-divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 20px 0;
+      }
+
+      .reader-footer {
+        padding: 16px 24px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .nav-btn {
+        padding: 8px 18px;
+        border-radius: 9px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text-secondary);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: "Noto Sans Bengali", sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .nav-btn:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--border-active);
+        color: var(--text-primary);
+      }
+      .nav-btn.primary {
+        background: rgba(13, 183, 237, 0.12);
+        border-color: rgba(13, 183, 237, 0.3);
+        color: var(--accent-cyan);
+      }
+      .nav-btn.primary:hover {
+        background: rgba(13, 183, 237, 0.22);
+      }
+      .nav-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      /* FOOTER */
+      .footer {
+        text-align: center;
+        margin-top: 44px;
+        padding: 22px 0;
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 13px;
+        line-height: 1.9;
+      }
+
+      /* SCROLLBAR */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-deep);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1a2d4f;
+        border-radius: 3px;
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 600px) {
+        .container {
+          padding: 18px 12px;
+        }
+        .header h1 {
+          font-size: 23px;
+        }
+        .phase-ttl {
+          font-size: 15.5px;
+        }
+        .tname {
+          font-size: 13px;
+        }
+        .timeline {
+          margin-left: 18px;
+          padding-left: 22px;
+        }
+        .tcard::before {
+          left: -29px;
+          width: 10px;
+          height: 10px;
+        }
+        .reader-panel {
+          margin: 10px;
+          border-radius: 14px;
+        }
+        .reader-header {
+          padding: 16px 18px 14px;
+        }
+        .reader-body {
+          padding: 18px;
+        }
+        .reader-header .rh-title {
+          font-size: 17px;
+        }
+        .readbtn {
+          padding: 3px 8px;
+          font-size: 11px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span class="whale">🐳</span>
+        <h1>Docker শেখার সম্পূর্ণ গাইডবুক</h1>
+        <p class="sub">শূন্য থেকে প্রো — সহজ বাংলায় বিস্তারিত ব্যাখ্যা সহ</p>
+        <span class="badge">📖 ২৫টি টপিক · ৯টি ফেজ · সম্পূর্ণ টিউটোরিয়াল</span>
+        <div class="progress-box">
+          <div class="progress-row">
+            <span>অগ্রগতি</span>
+            <span class="done" id="pText">0/25 সম্পন্ন (0%)</span>
+          </div>
+          <div class="pbar"><div class="pfill" id="pFill"></div></div>
+        </div>
+      </div>
+      <div id="roadmap"></div>
+      <div class="footer">
+        🎯 টিপস: প্রতিটি টপিক হাতে-কলমে প্র্যাক্টিস করো। "📖 পড়ুন" বাটনে ক্লিক
+        করে বিস্তারিত শিখো।<br />
+        শেষ করলে ✓ মার্ক করো — তোমার অগ্রগতি সেভ থাকবে!
+      </div>
+    </div>
+
+    <!-- READER OVERLAY -->
+    <div class="reader-overlay" id="readerOverlay">
+      <div class="reader-panel" id="readerPanel"></div>
+    </div>
+
+    <script>
+      // ======================== DATA ========================
+      const PHASES = [
+        {
+          phase: "Phase 1",
+          title: "ভিত্তি তৈরি (Foundation)",
+          color: "#0db7ed",
+          icon: "🧱",
+        },
+        {
+          phase: "Phase 2",
+          title: "Images নিয়ে কাজ",
+          color: "#1e90ff",
+          icon: "📦",
+        },
+        {
+          phase: "Phase 3",
+          title: "Container Management",
+          color: "#2196f3",
+          icon: "⚙️",
+        },
+        {
+          phase: "Phase 4",
+          title: "Data ও Storage",
+          color: "#4caf50",
+          icon: "💾",
+        },
+        { phase: "Phase 5", title: "Networking", color: "#ff9800", icon: "🌐" },
+        {
+          phase: "Phase 6",
+          title: "Docker Compose",
+          color: "#e91e63",
+          icon: "🎼",
+        },
+        {
+          phase: "Phase 7",
+          title: "Docker Hub ও Registry",
+          color: "#9c27b0",
+          icon: "☁️",
+        },
+        {
+          phase: "Phase 8",
+          title: "Production ও Best Practices",
+          color: "#f44336",
+          icon: "🚀",
+        },
+        {
+          phase: "Phase 9",
+          title: "Advanced Topics",
+          color: "#607d8b",
+          icon: "🧠",
+        },
+      ];
+
+      const TOPICS = [
+        // ===== PHASE 1 =====
+        {
+          id: 1,
+          phase: 0,
+          name: "Docker কী এবং কেন দরকার?",
+          points: [
+            "Docker কী? — containerization platform",
+            "VM vs Container পার্থক্য",
+            "Docker Architecture",
+            "Docker Engine কীভাবে কাজ করে",
+          ],
+          cmd: "docker --version",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🤔 Docker কী?</div>
+  <p class="r-p">Docker হলো একটি <b>containerization platform</b> — মানে এটা তোমার অ্যাপ্লিকেশনকে একটা "বাক্সে" (container) ভরে দেয়। এই বাক্সের ভিতরে অ্যাপ চালানোর জন্য যা যা দরকার — কোড, লাইব্রেরি, সেটিংস — সব থাকে।</p>
+  <p class="r-p">ধরো তুমি একটা Node.js অ্যাপ বানালে। তোমার কম্পিউটারে চলছে ঠিকমতো। কিন্তু তোমার বন্ধুর কম্পিউটারে গেলে "কাজ করছে না!" — কারণ তার Node version আলাদা, কোনো package নেই ইত্যাদি। Docker এই সমস্যার সমাধান।</p>
+  <div class="r-note">💡 সহজ ভাষায়: Docker = তোমার অ্যাপ + তার সব dependency একটা প্যাকেটে ভরে ফেলা। যেকোনো কম্পিউটারে চলবে!</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">⚔️ VM vs Container — পার্থক্য কী?</div>
+  <p class="r-p"><b>Virtual Machine (VM)</b> মানে পুরো একটা আলাদা অপারেটিং সিস্টেম চালানো — যেটা অনেক ভারী (GBs মেমরি লাগে, চালু হতে মিনিট খায়)।</p>
+  <p class="r-p"><b>Container</b> মানে শুধু অ্যাপ আর তার dependency — OS শেয়ার করে। তাই অনেক হালকা (MBs), সেকেন্ডে চালু হয়।</p>
+  <div class="r-code">VM:  [তোমার অ্যাপ] + [পুরো OS] + [ভার্চুয়াল হার্ডওয়্যার]  → ভারী, ধীর
+Container: [তোমার অ্যাপ] + [শুধু dependency]                → হালকা, দ্রুত</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🏗️ Docker Architecture</div>
+  <p class="r-p">Docker তিনটা প্রধান অংশ নিয়ে কাজ করে:</p>
+  <ul class="r-ul">
+    <li><b>Docker Client</b> — তুমি যখন <code>docker run</code> লেখো, এটাই Client। তোমার কমান্ড নেয়।</li>
+    <li><b>Docker Daemon (dockerd)</b> — এটা ব্যাকগ্রাউন্ডে চলে, container তৈরি করে, manage করে।</li>
+    <li><b>Docker Registry (Hub)</b> — এখানে images জমা থাকে। যেমন Docker Hub = images এর "App Store"।</li>
+  </ul>
+  <div class="r-code"><span class="r-comment"># তুমি → Client → Daemon → Container চালু!</span>
+তুমি লেখো: docker run nginx
+  ↓
+Client এটা Daemon কে পাঠায়
+  ↓
+Daemon nginx image খোঁজে (না থাকলে Hub থেকে download করে)
+  ↓
+Container তৈরি হয় এবং চালু হয়! ✅</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">✅ চেক করো Docker কাজ করছে কিনা</div>
+  <div class="r-code"><span class="r-comment"># Docker version দেখো</span>
+docker --version
+<span class="r-output">→ Docker version 24.0.7, build afdd53b</span>
+
+<span class="r-comment"># Docker সব info দেখো</span>
+docker info</div>
+  <div class="r-tip">✅ Best Practice: Docker install করার পর সবসময় <code>docker --version</code> দিয়ে চেক করে নাও।</div>
+</div>`,
+        },
+        {
+          id: 2,
+          phase: 0,
+          name: "Docker Install করা",
+          points: [
+            "Windows এ Install",
+            "Linux (Ubuntu) এ Install",
+            "Mac এ Install",
+            "Post-installation steps",
+          ],
+          cmd: "sudo apt-get install docker-ce docker-ce-cli containerd.io",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">💻 Linux (Ubuntu) এ Docker Install</div>
+  <p class="r-p">Ubuntu তে Docker install করা সবচেয়ে সহজ। নিচের ধাপগুলো ফলো করো:</p>
+  <div class="r-h3">ধাপ ১: পুরানো Docker মুছে ফেলো (যদি থাকে)</div>
+  <div class="r-code">sudo apt-get remove docker docker-engine docker.io containerd runc</div>
+  <div class="r-h3">ধাপ ২: প্রয়োজনীয় package install করো</div>
+  <div class="r-code">sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg lsb-release</div>
+  <div class="r-h3">ধাপ ৩: Docker এর official GPG key যোগ করো</div>
+  <div class="r-code">sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg</div>
+  <div class="r-h3">ধাপ ৪: Docker repository সেটআপ</div>
+  <div class="r-code">echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null</div>
+  <div class="r-h3">ধাপ ৫: Docker install করো</div>
+  <div class="r-code">sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🪟 Windows এ Docker Install</div>
+  <p class="r-p">Windows এ Docker Desktop install করতে হয়:</p>
+  <ul class="r-ul">
+    <li><b>Docker Desktop</b> ডাউনলোড করো — <code>docker.com</code> থেকে</li>
+    <li>Installer রান করো, WSL 2 enable করো (recommended)</li>
+    <li>Restart দাও, Docker Desktop চালু করো</li>
+  </ul>
+  <div class="r-warn">⚠️ Windows Home edition এ Hyper-V নেই, তাই WSL 2 backend ব্যবহার করতে হবে।</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🔧 Post-Installation: sudo ছাড়া Docker চালাও</div>
+  <p class="r-p">প্রতিবার <code>sudo</code> লেখা বিরক্তিকর। এটা ফিক্স করো:</p>
+  <div class="r-code"><span class="r-comment"># docker group এ নিজেকে যোগ করো</span>
+sudo usermod -aG docker $USER
+
+<span class="r-comment"># লগআউট করে আবার লগইন করো, তারপর চেক করো:</span>
+docker run hello-world
+<span class="r-output">→ Hello from Docker! ✅ (sudo ছাড়াই চলবে)</span></div>
+  <div class="r-tip">✅ Best Practice: সবসময় sudo ছাড়া Docker চালানোর সেটআপ করে নাও — Development এ অনেক সময় বাঁচবে।</div>
+</div>`,
+        },
+        {
+          id: 3,
+          phase: 0,
+          name: "প্রথম Container চালানো",
+          points: [
+            "docker run কমান্ড",
+            "Interactive mode (-it)",
+            "Detached mode (-d)",
+            "Container এ ঢোকা (exec)",
+          ],
+          cmd: "docker run hello-world\ndocker run -it ubuntu bash\ndocker run -d nginx",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🚀 প্রথম Container চালাও!</div>
+  <p class="r-p">Docker শেখার সবচেয়ে exciting মুহূর্ত — প্রথম container চালানো!</p>
+  <div class="r-code"><span class="r-comment"># Hello World container — Docker ঠিকমতো কাজ করছে কিনা চেক</span>
+docker run hello-world
+
+<span class="r-output">→ Hello from Docker!
+→ This message shows that your installation appears to be working correctly.</span></div>
+  <p class="r-p"><code>docker run</code> কমান্ড কী করে? তিনটা কাজ একসাথে:</p>
+  <ul class="r-ul">
+    <li><b>Image খোঁজে</b> — locally আছে কিনা, না থাকলে Docker Hub থেকে download করে</li>
+    <li><b>Container তৈরি করে</b> — image থেকে একটা container বানায়</li>
+    <li><b>Container চালু করে</b> — এবং আউটপুট দেখায়</li>
+  </ul>
+</div>
+<div class="r-section">
+  <div class="r-h2">🖥️ Interactive Mode (-it)</div>
+  <p class="r-p">মানে container এর ভিতরে ঢুকে কাজ করা — যেন তুমি আরেকটা কম্পিউটারে SSH করেছো!</p>
+  <div class="r-code"><span class="r-comment"># Ubuntu container চালু করো এবং ভিতরে ঢোকো</span>
+docker run -it ubuntu bash
+
+<span class="r-output">root@abc123:/# </span><span class="r-comment">← তুমি এখন container এর ভিতরে!</span>
+
+<span class="r-comment"># ভিতরে কিছু কমান্ড চালাও</span>
+ls
+cat /etc/os-release
+exit  <span class="r-comment">← বের হয়ে আসো</span></div>
+  <div class="r-note">💡 <code>-i</code> = interactive (ইনপুট দিতে পারবে), <code>-t</code> = terminal (সুন্দর terminal দেখাবে)। দুটো মিলে <code>-it</code>।</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🔄 Detached Mode (-d)</div>
+  <p class="r-p">মানে container ব্যাকগ্রাউন্ডে চলবে — তোমার terminal ফ্রি থাকবে।</p>
+  <div class="r-code"><span class="r-comment"># Nginx web server ব্যাকগ্রাউন্ডে চালাও</span>
+docker run -d nginx
+
+<span class="r-output">→ a1b2c3d4e5f6... (container ID)</span>
+
+<span class="r-comment"># চলছে কিনা দেখো</span>
+docker ps
+
+<span class="r-comment"># চলন্ত container এ ঢোকো</span>
+docker exec -it a1b2c3 bash</div>
+  <div class="r-tip">✅ Best Practice: Web server, database এসব সবসময় <code>-d</code> (detached) mode এ চালাও।</div>
+</div>`,
+        },
+        // ===== PHASE 2 =====
+        {
+          id: 4,
+          phase: 1,
+          name: "Docker Image বোঝা",
+          points: [
+            "Image কী — blueprint",
+            "Image vs Container",
+            "Image Layers",
+            "Docker Hub থেকে pull",
+          ],
+          cmd: "docker images\ndocker pull nginx\ndocker rmi <image_id>",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🖼️ Image কী?</div>
+  <p class="r-p">Image হলো container এর <b>blueprint</b> বা <b>ছাঁচ</b>। যেমন একটা কেকের ছাঁচ থেকে অনেক কেক বানানো যায়, একটা image থেকে অনেক container বানানো যায়।</p>
+  <div class="r-code">Image  →  Container
+(ছাঁচ)    (তৈরি জিনিস)
+(Class)   (Object)
+(Recipe)  (Dish)</div>
+  <p class="r-p">Image হলো <b>read-only</b> — মানে পরিবর্তন করা যায় না। Container চালু হলে তার উপরে একটা writable layer যোগ হয়।</p>
+</div>
+<div class="r-section">
+  <div class="r-h2">📚 Image Layers কীভাবে কাজ করে?</div>
+  <p class="r-p">প্রতিটা image অনেকগুলো <b>layer</b> দিয়ে তৈরি। Dockerfile এর প্রতিটা instruction একটা layer তৈরি করে।</p>
+  <div class="r-code"><span class="r-comment"># একটা image এর layers দেখো</span>
+docker history nginx
+
+Layer 4: CMD ["nginx", "-g", "daemon off;"]     ← সবার উপরে
+Layer 3: COPY nginx.conf                         ← 
+Layer 2: RUN apt-get install nginx               ←
+Layer 1: FROM ubuntu:22.04                        ← সবার নিচে (base)</div>
+  <div class="r-note">💡 Layers ক্যাশ হয়! তাই দ্বিতীয়বার build করলে অনেক দ্রুত হয় — শুধু পরিবর্তিত layer আবার build হয়।</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">📦 Image নিয়ে কাজ করার কমান্ড</div>
+  <div class="r-code"><span class="r-comment"># সব local images দেখো</span>
+docker images
+
+<span class="r-comment"># Docker Hub থেকে image download করো</span>
+docker pull nginx
+docker pull node:18
+docker pull ubuntu:22.04
+
+<span class="r-comment"># নির্দিষ্ট image মুছে ফেলো</span>
+docker rmi nginx
+
+<span class="r-comment"># সব unused images মুছো</span>
+docker image prune -a</div>
+  <div class="r-tip">✅ Best Practice: সবসময় specific tag ব্যবহার করো — <code>node:18</code> লেখো, শুধু <code>node</code> না। কারণ <code>latest</code> tag যেকোনো সময় পরিবর্তন হতে পারে!</div>
+</div>`,
+        },
+        {
+          id: 5,
+          phase: 1,
+          name: "Dockerfile লেখা",
+          points: [
+            "FROM, RUN, COPY, WORKDIR",
+            "CMD vs ENTRYPOINT",
+            "EXPOSE, ENV, ARG",
+            ".dockerignore",
+          ],
+          cmd: 'FROM node:18\nWORKDIR /app\nCOPY . .\nRUN npm install\nEXPOSE 3000\nCMD ["node", "index.js"]',
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">📝 Dockerfile কী?</div>
+  <p class="r-p">Dockerfile হলো একটা <b>রেসিপি</b> — যেটা বলে দেয় কীভাবে তোমার image তৈরি হবে। প্রতিটা লাইন একটা instruction।</p>
+  <p class="r-p">ফাইলের নাম হবে ঠিক <code>Dockerfile</code> (কোনো extension নেই)।</p>
+</div>
+<div class="r-section">
+  <div class="r-h2">🧱 প্রতিটা Instruction বিস্তারিত</div>
+  <div class="r-h3">FROM — কোন base image ব্যবহার করবে</div>
+  <div class="r-code"><span class="r-comment"># সবার প্রথমে FROM লিখতে হয়</span>
+FROM node:18-alpine    <span class="r-comment"># Node.js 18, Alpine Linux (ছোট size)</span>
+FROM python:3.11       <span class="r-comment"># Python 3.11</span>
+FROM ubuntu:22.04      <span class="r-comment"># Ubuntu</span></div>
+
+  <div class="r-h3">WORKDIR — কোন folder এ কাজ হবে</div>
+  <div class="r-code">WORKDIR /app  <span class="r-comment"># এরপর সব কমান্ড /app folder এ চলবে</span></div>
+
+  <div class="r-h3">COPY — তোমার ফাইল container এ কপি করো</div>
+  <div class="r-code">COPY package.json .     <span class="r-comment"># নির্দিষ্ট ফাইল কপি</span>
+COPY . .                <span class="r-comment"># সব কিছু কপি</span></div>
+
+  <div class="r-h3">RUN — Build এর সময় command চালাও</div>
+  <div class="r-code">RUN npm install         <span class="r-comment"># dependency install</span>
+RUN apt-get update && apt-get install -y curl  <span class="r-comment"># package install</span></div>
+
+  <div class="r-h3">EXPOSE — কোন port ব্যবহার হবে বলে দাও</div>
+  <div class="r-code">EXPOSE 3000  <span class="r-comment"># documentation purpose — আসলে port open করে না</span></div>
+
+  <div class="r-h3">ENV — Environment variable সেট করো</div>
+  <div class="r-code">ENV NODE_ENV=production
+ENV PORT=3000</div>
+
+  <div class="r-h3">CMD — Container চালু হলে কী command চলবে</div>
+  <div class="r-code">CMD ["node", "index.js"]      <span class="r-comment"># exec form (recommended ✅)</span>
+CMD node index.js             <span class="r-comment"># shell form</span></div>
+</div>
+<div class="r-section">
+  <div class="r-h2">⚔️ CMD vs ENTRYPOINT পার্থক্য</div>
+  <div class="r-code"><span class="r-comment"># CMD — override করা যায় (docker run এ নতুন command দিলে)</span>
+CMD ["node", "index.js"]
+docker run myapp node test.js  <span class="r-comment">← CMD override হয়ে test.js চলবে</span>
+
+<span class="r-comment"># ENTRYPOINT — override হয় না, সবসময় চলবে</span>
+ENTRYPOINT ["node"]
+CMD ["index.js"]
+docker run myapp test.js  <span class="r-comment">← node test.js চলবে</span></div>
+  <div class="r-tip">✅ Best Practice: বেশিরভাগ ক্ষেত্রে CMD ব্যবহার করো। ENTRYPOINT তখন ব্যবহার করো যখন container টা সবসময় একই program চালাবে।</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">📄 সম্পূর্ণ Dockerfile উদাহরণ</div>
+  <div class="r-code"><span class="r-comment"># Node.js অ্যাপের জন্য Dockerfile</span>
+FROM node:18-alpine
+
+WORKDIR /app
+
+<span class="r-comment"># প্রথমে শুধু package file কপি করো (layer caching এর জন্য)</span>
+COPY package*.json ./
+
+<span class="r-comment"># Dependency install করো</span>
+RUN npm ci --only=production
+
+<span class="r-comment"># এবার বাকি সব কোড কপি করো</span>
+COPY . .
+
+<span class="r-comment"># Port declare করো</span>
+EXPOSE 3000
+
+<span class="r-comment"># Environment variable</span>
+ENV NODE_ENV=production
+
+<span class="r-comment"># অ্যাপ চালাও</span>
+CMD ["node", "index.js"]</div>
+  <div class="r-note">💡 লক্ষ্য করো — <code>package.json</code> আগে কপি করেছি, তারপর <code>npm install</code>, তারপর বাকি কোড। কারণ কোড পরিবর্তন হলেও <code>npm install</code> layer ক্যাশ থেকে আসবে — build দ্রুত হবে!</div>
+</div>`,
+        },
+        {
+          id: 6,
+          phase: 1,
+          name: "Image Build করা",
+          points: [
+            "docker build কমান্ড",
+            "Build context",
+            ".dockerignore",
+            "Tag দিয়ে build",
+          ],
+          cmd: "docker build -t my-app:v1 .\ndocker build --no-cache -t my-app .",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🔨 Image Build করো</div>
+  <p class="r-p">Dockerfile লেখা হয়ে গেলে এবার সেটা থেকে image তৈরি করো:</p>
+  <div class="r-code"><span class="r-comment"># basic build (current directory তে Dockerfile আছে)</span>
+docker build -t my-app .
+
+<span class="r-comment"># tag (version) সহ build</span>
+docker build -t my-app:v1 .
+docker build -t my-app:latest .
+
+<span class="r-comment"># cache ছাড়া fresh build</span>
+docker build --no-cache -t my-app .
+
+<span class="r-comment"># আলাদা Dockerfile specify করো</span>
+docker build -f Dockerfile.prod -t my-app:prod .</div>
+  <p class="r-p">এখানে <code>.</code> (dot) মানে <b>build context</b> — Docker এই folder এর সব ফাইল Daemon কে পাঠায়।</p>
+</div>
+<div class="r-section">
+  <div class="r-h2">🚫 .dockerignore ফাইল</div>
+  <p class="r-p">Build context এ অপ্রয়োজনীয় ফাইল থাকলে build ধীর হয় এবং image বড় হয়। <code>.dockerignore</code> ফাইল দিয়ে বাদ দাও:</p>
+  <div class="r-code"><span class="r-comment"># .dockerignore ফাইল</span>
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+Dockerfile
+docker-compose.yml
+README.md
+.vscode</div>
+  <div class="r-warn">⚠️ <code>node_modules</code> কখনো image এ কপি করো না! Container এর ভিতরে <code>npm install</code> চালাও — কারণ তোমার কম্পিউটার আর container এর OS আলাদা হতে পারে।</div>
+  <div class="r-tip">✅ Best Practice: প্রতিটা প্রজেক্টে .dockerignore ফাইল রাখো। .gitignore এর মতোই গুরুত্বপূর্ণ!</div>
+</div>`,
+        },
+        // ===== PHASE 3 =====
+        {
+          id: 7,
+          phase: 2,
+          name: "Container Lifecycle",
+          points: [
+            "create, start, stop, restart",
+            "rm, prune",
+            "Container states বোঝা",
+          ],
+          cmd: "docker ps\ndocker ps -a\ndocker stop <id>\ndocker rm <id>\ndocker container prune",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🔄 Container এর জীবনচক্র</div>
+  <p class="r-p">একটা container এর বিভিন্ন অবস্থা (state) আছে:</p>
+  <div class="r-code">Created → Running → Paused/Stopped → Removed
+(তৈরি)    (চলছে)    (থামানো)          (মুছে ফেলা)</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">📋 প্রতিটা কমান্ড বিস্তারিত</div>
+  <div class="r-code"><span class="r-comment"># চলমান containers দেখো</span>
+docker ps
+<span class="r-output">CONTAINER ID  IMAGE  STATUS      NAMES
+a1b2c3d4      nginx  Up 5 min    my-web</span>
+
+<span class="r-comment"># সব containers দেখো (বন্ধ থাকা গুলোও)</span>
+docker ps -a
+
+<span class="r-comment"># Container থামাও (gracefully — 10 সেকেন্ড সময় দেয়)</span>
+docker stop my-web
+
+<span class="r-comment"># Container জোর করে থামাও (তাৎক্ষণিক)</span>
+docker kill my-web
+
+<span class="r-comment"># থামানো container আবার চালু করো</span>
+docker start my-web
+
+<span class="r-comment"># Restart করো (stop + start)</span>
+docker restart my-web
+
+<span class="r-comment"># Container মুছে ফেলো (আগে stop করতে হবে)</span>
+docker rm my-web
+
+<span class="r-comment"># চলন্ত container জোর করে মুছো</span>
+docker rm -f my-web
+
+<span class="r-comment"># সব বন্ধ container একসাথে মুছো</span>
+docker container prune</div>
+  <div class="r-tip">✅ Best Practice: <code>docker stop</code> ব্যবহার করো, <code>docker kill</code> না — কারণ stop container কে gracefully বন্ধ হতে দেয়।</div>
+</div>`,
+        },
+        {
+          id: 8,
+          phase: 2,
+          name: "Container Logs ও Debugging",
+          points: [
+            "logs দেখা",
+            "Real-time follow",
+            "inspect ও stats",
+            "Shell access",
+          ],
+          cmd: "docker logs <id>\ndocker logs -f <id>\ndocker inspect <id>\ndocker stats",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">📜 Logs দেখা — সমস্যা খুঁজে বের করো</div>
+  <p class="r-p">Container এ কিছু ভুল হলে প্রথম কাজ হলো logs দেখা:</p>
+  <div class="r-code"><span class="r-comment"># Container এর logs দেখো</span>
+docker logs my-web
+
+<span class="r-comment"># Real-time logs দেখো (live follow)</span>
+docker logs -f my-web
+
+<span class="r-comment"># শেষ ২০ লাইন দেখো</span>
+docker logs --tail 20 my-web
+
+<span class="r-comment"># নির্দিষ্ট সময়ের পরের logs</span>
+docker logs --since 2024-01-01 my-web</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🔍 Container Inspect ও Stats</div>
+  <div class="r-code"><span class="r-comment"># Container এর সব তথ্য (IP, config, mount ইত্যাদি)</span>
+docker inspect my-web
+
+<span class="r-comment"># শুধু IP address বের করো</span>
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' my-web
+
+<span class="r-comment"># সব container এর CPU, Memory ব্যবহার দেখো (live)</span>
+docker stats</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🐚 Container এ Shell Access</div>
+  <p class="r-p">চলন্ত container এর ভিতরে ঢুকে দেখো কী হচ্ছে:</p>
+  <div class="r-code"><span class="r-comment"># Bash shell দিয়ে ঢোকো</span>
+docker exec -it my-web /bin/bash
+
+<span class="r-comment"># Alpine image এ bash নেই, sh ব্যবহার করো</span>
+docker exec -it my-web /bin/sh
+
+<span class="r-comment"># ভিতরে ঢুকে একটা command চালাও</span>
+docker exec my-web cat /etc/nginx/nginx.conf</div>
+  <div class="r-tip">✅ Best Practice: Debug করতে গেলে প্রথমে <code>docker logs</code> দেখো, তারপর দরকার হলে <code>exec</code> দিয়ে ঢোকো।</div>
+</div>`,
+        },
+        {
+          id: 9,
+          phase: 2,
+          name: "Port Mapping ও Environment Variables",
+          points: [
+            "Host to Container port (-p)",
+            "Environment variable (-e)",
+            ".env file",
+            "Container naming",
+          ],
+          cmd: "docker run -d -p 8080:80 --name my-nginx nginx\ndocker run -e DB_HOST=localhost my-app",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🔌 Port Mapping বোঝো</div>
+  <p class="r-p">Container এর ভিতরে একটা app যদি port 80 তে চলে, তুমি ব্রাউজার থেকে সরাসরি সেটা দেখতে পারবে না। কারণ container isolated। তাই তোমার কম্পিউটারের একটা port কে container এর port এর সাথে connect করতে হবে।</p>
+  <div class="r-code"><span class="r-comment"># Format: -p HOST_PORT:CONTAINER_PORT</span>
+docker run -d -p 8080:80 nginx
+
+<span class="r-comment"># এখন ব্রাউজারে যাও: http://localhost:8080 → nginx দেখাবে!</span>
+
+<span class="r-comment"># একাধিক port map করো</span>
+docker run -d -p 3000:3000 -p 3001:3001 my-app
+
+<span class="r-comment"># Random host port assign করো</span>
+docker run -d -p 80 nginx  <span class="r-comment"># Docker নিজে একটা port বেছে নেবে</span></div>
+  <div class="r-note">💡 মনে রাখো: <code>-p 8080:80</code> মানে "আমার কম্পিউটারের 8080 port → container এর 80 port"।</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🔐 Environment Variables</div>
+  <p class="r-p">Database password, API key, config — এসব হার্ডকোড না করে environment variable দিয়ে পাস করো:</p>
+  <div class="r-code"><span class="r-comment"># একটা variable পাস করো</span>
+docker run -e DB_PASSWORD=secret123 my-app
+
+<span class="r-comment"># একাধিক variable</span>
+docker run -e DB_HOST=db -e DB_PORT=5432 -e DB_NAME=mydb my-app
+
+<span class="r-comment"># .env ফাইল থেকে সব variable লোড করো</span>
+docker run --env-file .env my-app</div>
+  <div class="r-code"><span class="r-comment"># .env ফাইলের উদাহরণ</span>
+DB_HOST=localhost
+DB_PORT=5432
+DB_PASSWORD=secret123
+NODE_ENV=production</div>
+  <div class="r-tip">✅ Best Practice: Sensitive data (password, key) সবসময় .env ফাইলে রাখো এবং .gitignore এ .env যোগ করো!</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🏷️ Container Naming</div>
+  <div class="r-code"><span class="r-comment"># Container এর নাম দাও (মনে রাখা সহজ)</span>
+docker run -d --name my-nginx -p 8080:80 nginx
+
+<span class="r-comment"># নাম দিয়ে manage করো (ID মনে না রেখে)</span>
+docker stop my-nginx
+docker logs my-nginx
+docker rm my-nginx</div>
+</div>`,
+        },
+        // ===== PHASE 4 =====
+        {
+          id: 10,
+          phase: 3,
+          name: "Docker Volumes",
+          points: [
+            "Volume কী এবং কেন দরকার",
+            "Named volume",
+            "Volume management",
+            "Sharing volumes",
+          ],
+          cmd: "docker volume create my-data\ndocker run -v my-data:/app/data my-app\ndocker volume ls",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">💾 সমস্যা: Container মুছলে Data হারায়!</div>
+  <p class="r-p">Container মুছে ফেললে (<code>docker rm</code>) তার ভিতরের সব data চলে যায়! Database container মুছলে সব data শেষ — এটা মারাত্মক!</p>
+  <p class="r-p"><b>সমাধান: Volume</b> — data কে container এর বাইরে রাখো।</p>
+  <div class="r-code"><span class="r-comment"># Volume ছাড়া (❌ data হারাবে)</span>
+docker run -d --name db postgres
+docker rm db  <span class="r-comment">← সব data গেল!</span>
+
+<span class="r-comment"># Volume সহ (✅ data safe)</span>
+docker run -d --name db -v my-db-data:/var/lib/postgresql/data postgres
+docker rm db  <span class="r-comment">← container গেল, কিন্তু data volume এ safe আছে!</span></div>
+</div>
+<div class="r-section">
+  <div class="r-h2">📦 Volume নিয়ে কাজ করা</div>
+  <div class="r-code"><span class="r-comment"># Volume তৈরি করো</span>
+docker volume create my-data
+
+<span class="r-comment"># সব volumes দেখো</span>
+docker volume ls
+
+<span class="r-comment"># Volume এর বিস্তারিত তথ্য</span>
+docker volume inspect my-data
+
+<span class="r-comment"># Container এ volume attach করো</span>
+docker run -d -v my-data:/app/data --name app my-app
+
+<span class="r-comment"># Volume মুছো</span>
+docker volume rm my-data
+
+<span class="r-comment"># সব unused volume মুছো</span>
+docker volume prune</div>
+  <div class="r-tip">✅ Best Practice: Database container এ সবসময় named volume ব্যবহার করো — <code>-v db-data:/var/lib/postgresql/data</code></div>
+</div>`,
+        },
+        {
+          id: 11,
+          phase: 3,
+          name: "Bind Mounts",
+          points: [
+            "Host folder mount করা",
+            "Volume vs Bind mount",
+            "Live reload for development",
+            "Read-only mount",
+          ],
+          cmd: "docker run -v $(pwd):/app my-app\ndocker run -v /host/path:/container/path:ro my-app",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">📂 Bind Mount কী?</div>
+  <p class="r-p">Bind mount মানে তোমার কম্পিউটারের একটা folder কে সরাসরি container এর সাথে connect করা। তুমি ফাইল পরিবর্তন করলে container এও সাথে সাথে দেখাবে!</p>
+  <div class="r-code"><span class="r-comment"># তোমার current folder কে container এর /app এ mount করো</span>
+docker run -v $(pwd):/app my-app
+
+<span class="r-comment"># এখন তুমি code edit করলে container এও reflect হবে — live reload!</span></div>
+</div>
+<div class="r-section">
+  <div class="r-h2">⚔️ Volume vs Bind Mount</div>
+  <div class="r-code">Volume:
+  ✅ Docker manage করে (docker volume create)
+  ✅ Production এ ভালো
+  ✅ Backup/migrate সহজ
+  ❌ Host এর কোথায় আছে জানা কঠিন
+
+Bind Mount:
+  ✅ তোমার folder সরাসরি ব্যবহার হয়
+  ✅ Development এ live reload এর জন্য দারুণ
+  ❌ Host OS এর উপর নির্ভর করে
+  ❌ Production এ unsafe হতে পারে</div>
+  <div class="r-tip">✅ Best Practice: Development এ bind mount, Production এ named volume ব্যবহার করো।</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🔒 Read-only Mount</div>
+  <div class="r-code"><span class="r-comment"># Container শুধু পড়তে পারবে, লিখতে পারবে না</span>
+docker run -v $(pwd)/config:/app/config:ro my-app
+<span class="r-comment">#                                      ↑ :ro = read-only</span></div>
+</div>`,
+        },
+        {
+          id: 12,
+          phase: 3,
+          name: "Container থেকে File Copy",
+          points: [
+            "Container → Host copy",
+            "Host → Container copy",
+            "Backup ও Restore",
+          ],
+          cmd: "docker cp <container>:/app/data ./backup\ndocker cp ./file.txt <container>:/app/",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">📋 File Copy করা</div>
+  <div class="r-code"><span class="r-comment"># Container থেকে তোমার কম্পিউটারে file আনো</span>
+docker cp my-container:/app/logs ./my-logs
+
+<span class="r-comment"># তোমার কম্পিউটার থেকে container এ file পাঠাও</span>
+docker cp ./config.json my-container:/app/config.json
+
+<span class="r-comment"># পুরো folder কপি করো</span>
+docker cp my-container:/app/data ./backup-folder</div>
+  <div class="r-note">💡 <code>docker cp</code> চলন্ত এবং বন্ধ — দুই ধরনের container এই কাজ করে!</div>
+  <div class="r-tip">✅ Best Practice: জরুরি backup এর জন্য <code>docker cp</code> ব্যবহার করো। কিন্তু নিয়মিত backup এর জন্য volume ব্যবহার করো।</div>
+</div>`,
+        },
+        // ===== PHASE 5 =====
+        {
+          id: 13,
+          phase: 4,
+          name: "Docker Networking Basics",
+          points: [
+            "Network কী",
+            "Default bridge",
+            "Network types",
+            "DNS resolution",
+          ],
+          cmd: "docker network ls\ndocker network inspect bridge",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🌐 Docker Network কী?</div>
+  <p class="r-p">Container গুলো কীভাবে একে অপরের সাথে কথা বলবে? Docker Network দিয়ে! ধরো তোমার একটা web app container আছে, আরেকটা database container আছে — দুজনকে connect করতে হবে।</p>
+</div>
+<div class="r-section">
+  <div class="r-h2">📡 Network Types</div>
+  <ul class="r-ul">
+    <li><b>bridge</b> (default) — সবচেয়ে বেশি ব্যবহৃত। Container গুলো একটা private network এ থাকে।</li>
+    <li><b>host</b> — Container সরাসরি host এর network ব্যবহার করে (isolation নেই)।</li>
+    <li><b>none</b> — কোনো network নেই, container সম্পূর্ণ isolated।</li>
+    <li><b>overlay</b> — Multiple Docker hosts এর মধ্যে networking (Swarm/Kubernetes)।</li>
+  </ul>
+  <div class="r-code"><span class="r-comment"># সব network দেখো</span>
+docker network ls
+<span class="r-output">NETWORK ID   NAME      DRIVER    SCOPE
+abc123       bridge    bridge    local
+def456       host      host      local
+ghi789       none      null      local</span>
+
+<span class="r-comment"># Network এর details দেখো</span>
+docker network inspect bridge</div>
+  <div class="r-warn">⚠️ Default bridge network এ container গুলো নাম দিয়ে একে অপরকে চিনতে পারে না — শুধু IP দিয়ে পারে। তাই custom network বানাও!</div>
+</div>`,
+        },
+        {
+          id: 14,
+          phase: 4,
+          name: "Custom Network তৈরি",
+          points: [
+            "User-defined network",
+            "Container name দিয়ে connect",
+            "Network isolation",
+            "Connect/Disconnect",
+          ],
+          cmd: "docker network create my-net\ndocker run -d --network my-net --name api my-api",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🔧 Custom Network তৈরি করো</div>
+  <p class="r-p">Custom network বানালে container গুলো <b>নাম দিয়ে</b> একে অপরকে খুঁজতে পারে — IP মনে রাখতে হয় না!</p>
+  <div class="r-code"><span class="r-comment"># Network তৈরি করো</span>
+docker network create my-app-network
+
+<span class="r-comment"># দুটো container কে একই network এ চালাও</span>
+docker run -d --network my-app-network --name api my-api
+docker run -d --network my-app-network --name db postgres
+
+<span class="r-comment"># এখন api container থেকে db কে নাম দিয়ে access করতে পারবে:</span>
+<span class="r-comment"># connection string: postgres://db:5432/mydb</span>
+<span class="r-comment">#                           ↑ container এর নাম!</span></div>
+  <div class="r-tip">✅ Best Practice: সবসময় custom network ব্যবহার করো — default bridge ব্যবহার করো না। Custom network এ automatic DNS resolution কাজ করে!</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🔌 Connect / Disconnect</div>
+  <div class="r-code"><span class="r-comment"># চলমান container কে network এ যোগ করো</span>
+docker network connect my-app-network existing-container
+
+<span class="r-comment"># Network থেকে সরাও</span>
+docker network disconnect my-app-network existing-container
+
+<span class="r-comment"># Network মুছে ফেলো</span>
+docker network rm my-app-network</div>
+</div>`,
+        },
+        // ===== PHASE 6 =====
+        {
+          id: 15,
+          phase: 5,
+          name: "Docker Compose পরিচিতি",
+          points: [
+            "Compose কী",
+            "কেন ব্যবহার করবে",
+            "YAML ফাইল structure",
+            "একসাথে multiple container",
+          ],
+          cmd: "docker compose version",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🎼 Docker Compose কী?</div>
+  <p class="r-p">ধরো তোমার প্রজেক্টে 3টা container দরকার — Web App, Database, Redis। প্রতিটার জন্য আলাদা আলাদা লম্বা <code>docker run</code> কমান্ড লেখা কষ্টকর!</p>
+  <p class="r-p"><b>Docker Compose</b> দিয়ে সব কিছু একটা YAML ফাইলে লিখে রাখো, তারপর এক কমান্ডে সব চালু!</p>
+  <div class="r-code"><span class="r-comment"># Compose ছাড়া (😫 প্রতিবার এতগুলো কমান্ড!)</span>
+docker network create mynet
+docker run -d --network mynet --name db -e POSTGRES_PASSWORD=secret -v db-data:/var/lib/postgresql/data postgres:15
+docker run -d --network mynet --name redis redis:alpine
+docker run -d --network mynet --name web -p 3000:3000 -e DB_HOST=db -e REDIS_HOST=redis my-app
+
+<span class="r-comment"># Compose দিয়ে (😍 এক কমান্ড!)</span>
+docker compose up -d</div>
+  <div class="r-note">💡 Docker Compose = অনেকগুলো container কে একটা ফাইলে define করো, এক কমান্ডে চালাও/বন্ধ করো।</div>
+</div>`,
+        },
+        {
+          id: 16,
+          phase: 5,
+          name: "docker-compose.yml লেখা",
+          points: [
+            "services, ports, volumes",
+            "environment variables",
+            "depends_on",
+            "networks, restart policy",
+          ],
+          cmd: "version: '3.8'\nservices:\n  web:\n    build: .\n    ports:\n      - '3000:3000'\n  db:\n    image: postgres:15",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">📝 YAML ফাইল লেখা শিখো</div>
+  <p class="r-p">নিচে একটা সম্পূর্ণ উদাহরণ — Web App + Database + Redis:</p>
+  <div class="r-code"><span class="r-comment"># docker-compose.yml</span>
+version: '3.8'
+
+services:
+  <span class="r-comment"># ১. Web Application</span>
+  web:
+    build: .                    <span class="r-comment"># current folder এর Dockerfile থেকে build</span>
+    ports:
+      - "3000:3000"             <span class="r-comment"># port mapping</span>
+    environment:
+      - DB_HOST=db              <span class="r-comment"># environment variable</span>
+      - REDIS_HOST=redis
+    volumes:
+      - ./src:/app/src          <span class="r-comment"># live reload এর জন্য bind mount</span>
+    depends_on:
+      - db                      <span class="r-comment"># db আগে চালু হবে</span>
+      - redis
+    restart: unless-stopped     <span class="r-comment"># crash হলে auto restart</span>
+
+  <span class="r-comment"># ২. Database</span>
+  db:
+    image: postgres:15          <span class="r-comment"># Docker Hub এর image</span>
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: myapp
+    volumes:
+      - db-data:/var/lib/postgresql/data  <span class="r-comment"># data persist</span>
+    restart: unless-stopped
+
+  <span class="r-comment"># ৩. Redis Cache</span>
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+
+<span class="r-comment"># Named volumes declare করো</span>
+volumes:
+  db-data:</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">📖 প্রতিটা অংশ ব্যাখ্যা</div>
+  <ul class="r-ul">
+    <li><b>services:</b> — প্রতিটা container এখানে define হয়</li>
+    <li><b>build:</b> — Dockerfile থেকে image build করো</li>
+    <li><b>image:</b> — Ready-made image ব্যবহার করো</li>
+    <li><b>ports:</b> — Port mapping (<code>-p</code> এর মতো)</li>
+    <li><b>environment:</b> — Environment variables (<code>-e</code> এর মতো)</li>
+    <li><b>volumes:</b> — Data persist করো (<code>-v</code> এর মতো)</li>
+    <li><b>depends_on:</b> — কোন service আগে চালু হবে</li>
+    <li><b>restart:</b> — Crash হলে কী করবে (no, always, unless-stopped, on-failure)</li>
+  </ul>
+  <div class="r-tip">✅ Best Practice: <code>restart: unless-stopped</code> ব্যবহার করো production এ — container crash হলে auto restart হবে!</div>
+</div>`,
+        },
+        {
+          id: 17,
+          phase: 5,
+          name: "Compose Commands",
+          points: ["up, down, logs", "ps, build, exec", "pull, restart"],
+          cmd: "docker compose up -d\ndocker compose down\ndocker compose logs -f",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🎮 Compose কমান্ড সব</div>
+  <div class="r-code"><span class="r-comment"># সব service চালু করো (background এ)</span>
+docker compose up -d
+
+<span class="r-comment"># সব বন্ধ করো এবং container মুছো</span>
+docker compose down
+
+<span class="r-comment"># বন্ধ করো + volumes ও মুছো (⚠️ data হারাবে!)</span>
+docker compose down -v
+
+<span class="r-comment"># Logs দেখো</span>
+docker compose logs
+docker compose logs -f web     <span class="r-comment"># শুধু web service এর live logs</span>
+
+<span class="r-comment"># চলমান services দেখো</span>
+docker compose ps
+
+<span class="r-comment"># Image rebuild করো (code পরিবর্তনের পর)</span>
+docker compose build
+docker compose build --no-cache  <span class="r-comment"># cache ছাড়া</span>
+docker compose up -d --build     <span class="r-comment"># build + start একসাথে</span>
+
+<span class="r-comment"># চলন্ত container এ command চালাও</span>
+docker compose exec web sh
+docker compose exec db psql -U postgres
+
+<span class="r-comment"># Images update করো</span>
+docker compose pull</div>
+  <div class="r-tip">✅ Best Practice: Code পরিবর্তনের পর <code>docker compose up -d --build</code> ব্যবহার করো — rebuild + restart একসাথে!</div>
+</div>`,
+        },
+        // ===== PHASE 7 =====
+        {
+          id: 18,
+          phase: 6,
+          name: "Docker Hub ব্যবহার",
+          points: [
+            "Docker Hub কী",
+            "login/logout",
+            "Image push/pull",
+            "Tagging strategy",
+          ],
+          cmd: "docker login\ndocker tag my-app user/my-app:v1\ndocker push user/my-app:v1",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">☁️ Docker Hub কী?</div>
+  <p class="r-p">Docker Hub হলো images এর <b>"GitHub"</b> — এখানে তুমি তোমার image আপলোড করতে পারো, অন্যরাও ব্যবহার করতে পারে।</p>
+  <div class="r-code"><span class="r-comment"># Docker Hub এ login করো</span>
+docker login
+<span class="r-output">Username: tomar-username
+Password: ****
+Login Succeeded ✅</span>
+
+<span class="r-comment"># তোমার image কে tag করো (username/repo:version)</span>
+docker tag my-app:latest tomar-username/my-app:v1
+
+<span class="r-comment"># Docker Hub এ push করো</span>
+docker push tomar-username/my-app:v1
+
+<span class="r-comment"># অন্য কম্পিউটার থেকে pull করো</span>
+docker pull tomar-username/my-app:v1
+
+<span class="r-comment"># Logout করো</span>
+docker logout</div>
+  <div class="r-tip">✅ Best Practice: Semantic versioning ব্যবহার করো — <code>v1.0.0</code>, <code>v1.1.0</code>, <code>v2.0.0</code>। শুধু <code>latest</code> ব্যবহার করো না!</div>
+</div>`,
+        },
+        {
+          id: 19,
+          phase: 6,
+          name: "Private Registry",
+          points: [
+            "নিজের registry চালানো",
+            "Cloud registries (ECR, GCR, ACR)",
+            "Security",
+          ],
+          cmd: "docker run -d -p 5000:5000 registry:2\ndocker push localhost:5000/my-app",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🔒 Private Registry কেন?</div>
+  <p class="r-p">Company এর code public Docker Hub এ রাখা ঠিক না। তাই private registry ব্যবহার করো:</p>
+  <div class="r-code"><span class="r-comment"># নিজের local registry চালাও</span>
+docker run -d -p 5000:5000 --name registry registry:2
+
+<span class="r-comment"># Image tag করো local registry এর জন্য</span>
+docker tag my-app localhost:5000/my-app:v1
+
+<span class="r-comment"># Push করো</span>
+docker push localhost:5000/my-app:v1
+
+<span class="r-comment"># Pull করো</span>
+docker pull localhost:5000/my-app:v1</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">☁️ Cloud Registry Options</div>
+  <ul class="r-ul">
+    <li><b>AWS ECR</b> (Elastic Container Registry) — AWS ব্যবহার করলে best</li>
+    <li><b>Google GCR / Artifact Registry</b> — GCP ব্যবহারকারীদের জন্য</li>
+    <li><b>Azure ACR</b> — Azure ব্যবহারকারীদের জন্য</li>
+    <li><b>GitHub Container Registry (ghcr.io)</b> — GitHub এর সাথে integrated</li>
+  </ul>
+  <div class="r-tip">✅ Best Practice: Production এ Cloud registry ব্যবহার করো — এগুলো secure, scalable, আর CI/CD এর সাথে সহজে integrate হয়।</div>
+</div>`,
+        },
+        // ===== PHASE 8 =====
+        {
+          id: 20,
+          phase: 7,
+          name: "Dockerfile Best Practices",
+          points: [
+            "Image size ছোট রাখা",
+            "Multi-stage builds",
+            "Layer caching",
+            "Non-root user, HEALTHCHECK",
+          ],
+          cmd: "FROM node:18 AS builder\nWORKDIR /app\nCOPY . .\nRUN npm run build\n\nFROM node:18-alpine\nCOPY --from=builder /app/dist ./dist",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🏆 Production-Ready Dockerfile</div>
+  <div class="r-h3">১. Alpine base image ব্যবহার করো (ছোট size)</div>
+  <div class="r-code"><span class="r-comment"># ❌ বড় image (900MB+)</span>
+FROM node:18
+
+<span class="r-comment"># ✅ ছোট image (150MB)</span>
+FROM node:18-alpine</div>
+
+  <div class="r-h3">২. Multi-stage Build (সবচেয়ে গুরুত্বপূর্ণ!)</div>
+  <p class="r-p">Build এর জন্য বড় image ব্যবহার করো, কিন্তু final image এ শুধু output রাখো:</p>
+  <div class="r-code"><span class="r-comment"># Stage 1: Build (বড় image, সব dev tools আছে)</span>
+FROM node:18 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+<span class="r-comment"># Stage 2: Production (ছোট image, শুধু যা দরকার)</span>
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+EXPOSE 3000
+USER node
+CMD ["node", "dist/index.js"]</div>
+  <div class="r-note">💡 Multi-stage build এ final image অনেক ছোট হয় — কারণ build tools, source code, dev dependencies কিছুই থাকে না!</div>
+
+  <div class="r-h3">৩. Non-root User ব্যবহার করো</div>
+  <div class="r-code"><span class="r-comment"># ❌ Root হিসেবে চালানো (security risk!)</span>
+CMD ["node", "index.js"]
+
+<span class="r-comment"># ✅ Non-root user হিসেবে চালানো</span>
+USER node
+CMD ["node", "index.js"]</div>
+
+  <div class="r-h3">৪. HEALTHCHECK যোগ করো</div>
+  <div class="r-code">HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1</div>
+  <div class="r-tip">✅ Best Practice Summary: Alpine base + Multi-stage + Non-root + HEALTHCHECK = Production-ready Dockerfile!</div>
+</div>`,
+        },
+        {
+          id: 21,
+          phase: 7,
+          name: "Docker Security",
+          points: [
+            "Non-root containers",
+            "Image scanning",
+            "Resource limits",
+            "Read-only filesystem",
+          ],
+          cmd: "docker run --memory=512m --cpus=1.0 my-app\ndocker scout cves my-app",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🛡️ Docker Security Best Practices</div>
+  <div class="r-code"><span class="r-comment"># ১. Resource limits দাও (container যেন সব resource খেয়ে না ফেলে)</span>
+docker run --memory=512m --cpus=1.0 my-app
+
+<span class="r-comment"># ২. Read-only filesystem (container কিছু লিখতে পারবে না)</span>
+docker run --read-only my-app
+
+<span class="r-comment"># ৩. Image vulnerability scan করো</span>
+docker scout cves my-app
+
+<span class="r-comment"># ৪. Specific user হিসেবে চালাও</span>
+docker run --user 1000:1000 my-app
+
+<span class="r-comment"># ৫. Capabilities drop করো (extra permission সরাও)</span>
+docker run --cap-drop ALL --cap-add NET_BIND_SERVICE my-app</div>
+  <div class="r-warn">⚠️ কখনো container এ sensitive data (password, key) environment variable হিসেবে <code>docker inspect</code> এ দেখা যায়। Production এ Docker Secrets ব্যবহার করো!</div>
+</div>`,
+        },
+        {
+          id: 22,
+          phase: 7,
+          name: "Docker System Management",
+          points: [
+            "Disk cleanup (prune)",
+            "System info ও df",
+            "Dangling images/volumes cleanup",
+          ],
+          cmd: "docker system prune -a\ndocker system df",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🧹 Docker পরিষ্কার রাখো</div>
+  <p class="r-p">Docker ব্যবহার করতে করতে অনেক unused images, containers, volumes জমে যায় — disk ভরে যায়!</p>
+  <div class="r-code"><span class="r-comment"># কতটুকু disk ব্যবহার হচ্ছে দেখো</span>
+docker system df
+<span class="r-output">TYPE          TOTAL   ACTIVE   SIZE     RECLAIMABLE
+Images        15      3        5.2GB    4.1GB (78%)
+Containers    8       2        120MB    95MB
+Volumes       5       2        800MB    500MB</span>
+
+<span class="r-comment"># সব unused জিনিস একসাথে মুছো</span>
+docker system prune
+
+<span class="r-comment"># সব unused images ও মুছো (আরো বেশি space ফ্রি হবে)</span>
+docker system prune -a
+
+<span class="r-comment"># আলাদা আলাদা মুছো</span>
+docker image prune       <span class="r-comment"># dangling images</span>
+docker container prune   <span class="r-comment"># stopped containers</span>
+docker volume prune      <span class="r-comment"># unused volumes</span>
+docker network prune     <span class="r-comment"># unused networks</span></div>
+  <div class="r-tip">✅ Best Practice: মাসে একবার <code>docker system prune -a</code> চালাও — GBs of disk space ফ্রি হবে!</div>
+</div>`,
+        },
+        // ===== PHASE 9 =====
+        {
+          id: 23,
+          phase: 8,
+          name: "Docker Swarm (পরিচিতি)",
+          points: ["Swarm কী", "Service তৈরি ও scale", "Swarm vs Kubernetes"],
+          cmd: "docker swarm init\ndocker service create --replicas 3 nginx",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🐝 Docker Swarm কী?</div>
+  <p class="r-p">Swarm হলো Docker এর built-in <b>orchestration</b> tool — মানে অনেকগুলো server (node) মিলে একটা cluster তৈরি করা, এবং সেখানে containers manage করা।</p>
+  <div class="r-code"><span class="r-comment"># Swarm mode চালু করো</span>
+docker swarm init
+
+<span class="r-comment"># Service তৈরি করো (3 copies চলবে)</span>
+docker service create --replicas 3 -p 80:80 --name web nginx
+
+<span class="r-comment"># Services দেখো</span>
+docker service ls
+
+<span class="r-comment"># Scale করো (5 copies করো)</span>
+docker service scale web=5
+
+<span class="r-comment"># Swarm ছেড়ে দাও</span>
+docker swarm leave --force</div>
+  <div class="r-note">💡 Swarm শেখা সহজ কিন্তু বেশিরভাগ company Kubernetes ব্যবহার করে। Swarm ছোট প্রজেক্টের জন্য ভালো।</div>
+</div>`,
+        },
+        {
+          id: 24,
+          phase: 8,
+          name: "Kubernetes পরিচিতি",
+          points: [
+            "K8s কী",
+            "Pod, Service, Deployment",
+            "Minikube",
+            "kubectl basics",
+          ],
+          cmd: "minikube start\nkubectl get pods\nkubectl apply -f deployment.yml",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">☸️ Kubernetes (K8s) কী?</div>
+  <p class="r-p">Kubernetes হলো container orchestration এর <b>king</b>। Google বানিয়েছে। বড় বড় company (Google, Amazon, Netflix) সব Kubernetes ব্যবহার করে।</p>
+  <p class="r-p">Docker দিয়ে container তৈরি করো, Kubernetes দিয়ে সেগুলো manage করো — scale, heal, deploy, rollback সব automatic!</p>
+</div>
+<div class="r-section">
+  <div class="r-h2">🧩 মূল Concepts</div>
+  <ul class="r-ul">
+    <li><b>Pod</b> — সবচেয়ে ছোট unit, এক বা একাধিক container থাকে</li>
+    <li><b>Service</b> — Pod গুলোকে access করার stable endpoint</li>
+    <li><b>Deployment</b> — Pod কতগুলো চলবে, কীভাবে update হবে সেটা manage করে</li>
+  </ul>
+  <div class="r-code"><span class="r-comment"># Minikube দিয়ে locally K8s চালাও</span>
+minikube start
+
+<span class="r-comment"># Basic kubectl commands</span>
+kubectl get pods
+kubectl get services
+kubectl get deployments
+
+<span class="r-comment"># YAML ফাইল থেকে deploy করো</span>
+kubectl apply -f deployment.yml</div>
+  <div class="r-tip">✅ Best Practice: Docker ভালোভাবে শেখার পর Kubernetes শেখো — Docker ছাড়া K8s বোঝা কঠিন!</div>
+</div>`,
+        },
+        {
+          id: 25,
+          phase: 8,
+          name: "CI/CD তে Docker",
+          points: [
+            "GitHub Actions এ Docker",
+            "Automated build ও push",
+            "Layer caching",
+            "Multi-env deployment",
+          ],
+          cmd: "# GitHub Actions\nname: Build\non: push\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: docker build -t app .",
+          tutorial: `
+<div class="r-section">
+  <div class="r-h2">🔄 CI/CD তে Docker কেন?</div>
+  <p class="r-p">তুমি code push করলেই automatic:</p>
+  <ul class="r-ul">
+    <li>Docker image build হবে</li>
+    <li>Test চলবে</li>
+    <li>Image registry তে push হবে</li>
+    <li>Server এ deploy হবে</li>
+  </ul>
+  <p class="r-p">এটাই CI/CD (Continuous Integration / Continuous Deployment)!</p>
+</div>
+<div class="r-section">
+  <div class="r-h2">🐙 GitHub Actions উদাহরণ</div>
+  <div class="r-code"><span class="r-comment"># .github/workflows/docker.yml</span>
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      <span class="r-comment"># ১. Code checkout করো</span>
+      - uses: actions/checkout@v4
+
+      <span class="r-comment"># ২. Docker Hub এ login করো</span>
+      - uses: docker/login-action@v3
+        with:
+          username: \${{ secrets.DOCKER_USERNAME }}
+          password: \${{ secrets.DOCKER_PASSWORD }}
+
+      <span class="r-comment"># ৩. Image build এবং push করো</span>
+      - uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: username/my-app:latest</div>
+  <div class="r-note">💡 GitHub repository এর Settings → Secrets এ DOCKER_USERNAME ও DOCKER_PASSWORD যোগ করো।</div>
+  <div class="r-tip">✅ Best Practice: CI/CD pipeline এ Docker layer caching enable করো — build time অনেক কমবে!</div>
+</div>
+<div class="r-section">
+  <div class="r-h2">🎉 অভিনন্দন!</div>
+  <p class="r-p">তুমি Docker এর সম্পূর্ণ roadmap শেষ করেছো! এখন তুমি জানো:</p>
+  <ul class="r-ul">
+    <li>Container তৈরি ও manage করা</li>
+    <li>Dockerfile লেখা ও image build করা</li>
+    <li>Docker Compose দিয়ে multi-container app চালানো</li>
+    <li>Networking, Volumes, Security</li>
+    <li>Production best practices</li>
+    <li>CI/CD তে Docker ব্যবহার</li>
+  </ul>
+  <p class="r-p">পরবর্তী ধাপ: <b>Kubernetes</b> গভীরভাবে শেখো এবং real project এ Docker ব্যবহার করো! 🚀</p>
+</div>`,
+        },
+      ];
+
+      // ======================== STATE ========================
+      let completed = {};
+      try {
+        completed = JSON.parse(localStorage.getItem("docker_done2") || "{}");
+      } catch (e) {}
+      let expandedId = null;
+
+      function save() {
+        localStorage.setItem("docker_done2", JSON.stringify(completed));
+      }
+      function updateProgress() {
+        const done = Object.values(completed).filter(Boolean).length;
+        const pct = Math.round((done / 25) * 100);
+        document.getElementById("pText").textContent =
+          `${done}/25 সম্পন্ন (${pct}%)`;
+        document.getElementById("pFill").style.width = pct + "%";
+      }
+
+      function toggleExpand(id) {
+        expandedId = expandedId === id ? null : id;
+        render();
+      }
+      function toggleCheck(id, e) {
+        e.stopPropagation();
+        completed[id] = !completed[id];
+        save();
+        render();
+      }
+
+      function copyCmd(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+          btn.textContent = "✓ কপি হয়েছে";
+          setTimeout(() => (btn.textContent = "কপি"), 1200);
+        });
+      }
+
+      // ======================== READER ========================
+      function openReader(id) {
+        event.stopPropagation();
+        const t = TOPICS.find((x) => x.id === id);
+        const ph = PHASES[t.phase];
+        const prevT = TOPICS.find((x) => x.id === id - 1);
+        const nextT = TOPICS.find((x) => x.id === id + 1);
+
+        document.getElementById("readerPanel").innerHTML = `
+    <div class="reader-header">
+      <div class="rh-left">
+        <div class="rh-phase" style="color:${ph.color}">${ph.phase} — ${ph.title}</div>
+        <div class="rh-title">${t.name}</div>
+      </div>
+      <span class="rh-num" style="background:${ph.color}22;color:${ph.color}">#${t.id}</span>
+      <button class="close-btn" onclick="closeReader()">✕</button>
+    </div>
+    <div class="reader-body">${t.tutorial}</div>
+    <div class="reader-footer">
+      <button class="nav-btn" onclick="openReaderById(${id - 1})" ${!prevT ? "disabled" : ""}>← আগের টপিক</button>
+      <button class="nav-btn primary" onclick="closeReader()">বন্ধ করুন</button>
+      <button class="nav-btn" onclick="openReaderById(${id + 1})" ${!nextT ? "disabled" : ""}>পরের টপিক →</button>
+    </div>
+  `;
+        const overlay = document.getElementById("readerOverlay");
+        overlay.classList.add("active");
+        overlay.scrollTop = 0;
+        document.body.style.overflow = "hidden";
+      }
+
+      function openReaderById(id) {
+        if (id < 1 || id > 25) return;
+        openReader(id);
+      }
+
+      function closeReader() {
+        document.getElementById("readerOverlay").classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      document
+        .getElementById("readerOverlay")
+        .addEventListener("click", function (e) {
+          if (e.target === this) closeReader();
+        });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") closeReader();
+      });
+
+      // ======================== RENDER ========================
+      function render() {
+        const el = document.getElementById("roadmap");
+        el.innerHTML = "";
+        let phaseIdx = -1;
+        let currentDiv = null;
+        let timelineDiv = null;
+
+        TOPICS.forEach((t) => {
+          if (t.phase !== phaseIdx) {
+            phaseIdx = t.phase;
+            const ph = PHASES[phaseIdx];
+            currentDiv = document.createElement("div");
+            currentDiv.className = "phase";
+            currentDiv.innerHTML = `
+        <div class="phase-head">
+          <div class="phase-ico" style="background:${ph.color}12;border-color:${ph.color}">${ph.icon}</div>
+          <div>
+            <div class="phase-lbl" style="color:${ph.color}">${ph.phase}</div>
+            <div class="phase-ttl">${ph.title}</div>
+          </div>
+        </div>
+      `;
+            timelineDiv = document.createElement("div");
+            timelineDiv.className = "timeline";
+            timelineDiv.style.borderColor = ph.color + "22";
+            currentDiv.appendChild(timelineDiv);
+            el.appendChild(currentDiv);
+          }
+
+          const ph = PHASES[t.phase];
+          const isOpen = expandedId === t.id;
+          const isDone = !!completed[t.id];
+
+          let pointsHTML = "";
+          t.points.forEach((p) => {
+            pointsHTML += `<div class="ditem" style="border-color:${ph.color}33">${p}</div>`;
+          });
+
+          const card = document.createElement("div");
+          card.className = `tcard ${isOpen ? "open" : ""} ${isDone ? "done" : ""}`;
+          card.onclick = () => toggleExpand(t.id);
+          card.innerHTML = `
+      <style>
+        .tcard:nth-child(${t.id - TOPICS.filter((x) => x.phase < t.phase).length})::before { border-color:${ph.color}; }
+        ${isDone ? `.tcard.done:nth-child(${t.id - TOPICS.filter((x) => x.phase < t.phase).length})::before { background:${ph.color}; box-shadow:0 0 8px ${ph.color}; }` : ""}
+      </style>
+      <div class="ttop">
+        <div class="tleft">
+          <span class="tnum" style="background:${ph.color}22;color:${ph.color}">#${t.id}</span>
+          <span class="tname">${t.name}</span>
+        </div>
+        <div class="tright">
+          <button class="readbtn" style="border-color:${ph.color}55;color:${ph.color}" onclick="openReader(${t.id})">📖 পড়ুন</button>
+          <button class="chkbtn ${isDone ? "on" : ""}" style="border-color:${ph.color};${isDone ? "background:" + ph.color : ""}" onclick="toggleCheck(${t.id},event)">${isDone ? "✓" : ""}</button>
+          <span class="arr">▾</span>
+        </div>
+      </div>
+      <div class="tdetails">
+        <div class="dlabel">📋 মূল বিষয়:</div>
+        ${pointsHTML}
+        <div class="clabel">💻 কমান্ড / কোড:</div>
+        <div class="cblock"><button class="cpbtn" onclick="event.stopPropagation();copyCmd(\`${t.cmd.replace(/`/g, "\\`")}\`,this)">কপি</button>${t.cmd}</div>
+      </div>
+    `;
+          timelineDiv.appendChild(card);
+        });
+
+        updateProgress();
+      }
+
+      render();
+    </script>
+  </body>
+</html>
